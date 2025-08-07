@@ -236,11 +236,11 @@ void initSolver() {
     kociembaInit();
     std::cout << "Kociemba initialized" << std::endl;
 
-    std::cout << "Preloading Korf Tables!" << std::endl;
+    /*std::cout << "Preloading Korf Tables!" << std::endl;
     LOWER_BOUND_CORNERS.ensureLoaded();
     LOWER_BOUND_PARTIAL_EDGES_GROUP_1.ensureLoaded();
     LOWER_BOUND_PARTIAL_EDGES_GROUP_2.ensureLoaded();
-    LOWER_BOUND_EDGE_PERMS.ensureLoaded();
+    LOWER_BOUND_EDGE_PERMS.ensureLoaded();*/
 }
 
 template<typename IsSolvedFunc, typename HeuristicFunc, int MoveCount>
@@ -428,9 +428,9 @@ std::optional<std::vector<int>> solveCFOP(FastRubiksCube cube, bool& halt) {
 }
 
 std::optional<std::vector<Move>> solve(FastRubiksCube cube, bool& halt) {
-    //return kociembaSolve(cube, halt);
+    return kociembaSolve(cube, halt);
 
-    auto res = solveCFOP(cube, halt);
+    /*auto res = solveCFOP(cube, halt);
 
     if (!res) {
         return std::nullopt;
@@ -441,5 +441,5 @@ std::optional<std::vector<Move>> solve(FastRubiksCube cube, bool& halt) {
         out.push_back(ALL_MOVES[move]);
     }
 
-    return out;
+    return out;*/
 }

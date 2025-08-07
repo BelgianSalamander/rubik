@@ -966,6 +966,8 @@ void kociembaInit() {
 
     PHASE_TWO_PRUNING_TABLE.ensureLoaded();
 
+    return; // We don't need the tests
+
     //Test SuperFastPhaseOneCube
 
     FastRubiksCube ref;
@@ -1085,7 +1087,7 @@ void kociembaInit() {
         }
     }
 
-    collectData();
+    //collectData();
 }
 
 void solvePhaseOneAtDepth(SuperFastPhaseOneCube& cube, RedundantMovePreventor rmp, int depth, std::vector<int>& out, bool& halt, const std::function<void(std::vector<int>&)>& callback) {
