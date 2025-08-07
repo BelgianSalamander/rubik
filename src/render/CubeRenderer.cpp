@@ -152,6 +152,8 @@ CubeRenderer::CubeRenderer()
     lastFrameTime = glfwGetTime();
     cameraMode = true;
     initGL();
+
+    memcpy_s(this->robotIpField, sizeof(this->robotIpField), robot.getIp().c_str(), robot.getIp().size() + 1);
 }
 
 CubeRenderer::~CubeRenderer() {
@@ -490,15 +492,19 @@ void CubeRenderer::renderImGui() {
         }
     }
 
+    solverMutex.lock();
+
     if (solverState == SolverState::OFF) {
         ImGui::Text("Solver is off");
     } else if (solverState == SolverState::RUNNING) {
-        ImGui::Text("Solver is running");
+        if (solverStatusMessage.size()) {
+            ImGui::Text("Solver is running (%s)", solverStatusMessage.c_str());
+        } else {
+            ImGui::Text("Solver is running");
+        }
     } else if (solverState == SolverState::STOPPING) {
         ImGui::Text("Solver is stopping");
     }
-
-    solverMutex.lock();
 
     if (!solverResult.has_value()) {
         ImGui::Text("No solution discovered yet");
@@ -525,13 +531,23 @@ void CubeRenderer::renderImGui() {
     }
 
     if (robot.isActive()) {
-        ImGui::Text("Connected to robot!");
+        ImGui::Text("Connected to robot on %s!", robot.getIp().c_str());
 
         if (ImGui::Button("Reset")) {
             robot.resetRobot();
         }
     } else {
         ImGui::Text("Not connected to robot");
+        if (robot.isListening()) {
+            ImGui::Text("Waiting on %s", robot.getIp().c_str());
+        } else {
+            ImGui::Text("Couldn't listen on %s:%d", robot.getIp().c_str(), robot.getPort());
+        }
+        ImGui::InputText("New IP", this->robotIpField, sizeof(robotIpField));
+        if (ImGui::Button("Set IP")) {
+            std::cout << "Updating IP" << std::endl;
+            this->robot.reconfigure(this->robotIpField, this->robot.getPort());
+        }
     }
 
     ImGui::End();
@@ -830,9 +846,17 @@ void CubeRenderer::launchSolver() {
     this->haltSolver = false;
 
     this->solverThread.reset();
-    this->solverThread = std::thread([this]() {
+    this->solverStatusMessage = "";
+
+    auto updateStatus = [this](std::string msg) {
+        this->solverMutex.lock();
+        this->solverStatusMessage = msg;
+        this->solverMutex.unlock();
+    };
+
+    this->solverThread = std::thread([this, updateStatus]() {
         auto start = std::chrono::high_resolution_clock::now();
-        auto optMoves = solve(FastRubiksCube(this->cube), this->haltSolver);
+        auto optMoves = solve(FastRubiksCube(this->cube), this->haltSolver, updateStatus);
         auto end = std::chrono::high_resolution_clock::now();
 
         std::chrono::duration<double> elapsed = end - start;

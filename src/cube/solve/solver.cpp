@@ -427,8 +427,8 @@ std::optional<std::vector<int>> solveCFOP(FastRubiksCube cube, bool& halt) {
     return std::nullopt;
 }
 
-std::optional<std::vector<Move>> solve(FastRubiksCube cube, bool& halt) {
-    return kociembaSolve(cube, halt);
+std::optional<std::vector<Move>> solve(FastRubiksCube cube, bool& halt, std::function<void (std::string)> statusUpdateCallback) {
+    return kociembaSolve(cube, halt, statusUpdateCallback);
 
     /*auto res = solveCFOP(cube, halt);
 

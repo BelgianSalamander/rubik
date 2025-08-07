@@ -21,7 +21,7 @@ uint32_t phase2EdgePermutationCoordinate(const FastRubiksCube& cube);
 
 FastRubiksCube reduceTest(const FastRubiksCube& cube);
 
-std::optional<std::vector<Move>> kociembaSolve(FastRubiksCube cube, bool& halt);
+std::optional<std::vector<Move>> kociembaSolve(FastRubiksCube cube, bool& halt, std::function<void (std::string)> statusUpdateCallback);
 
 void collectData();
 

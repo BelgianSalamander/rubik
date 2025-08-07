@@ -24,6 +24,16 @@ void initWinsock() {
 
 CuberConnection::CuberConnection(std::string ip, int port) {
     initWinsock();
+    this->reconfigure(ip, port);
+
+}
+
+void CuberConnection::reconfigure(std::string newIp, int newPort) {
+    this->ip = newIp;
+    this->port = newPort;
+
+    listening = false;
+
     if ((listener = socket(AF_INET, SOCK_STREAM, 0)) == INVALID_SOCKET) {
         std::cout << "Could not create socket: " << WSAGetLastError() << std::endl;
         return;
@@ -31,8 +41,8 @@ CuberConnection::CuberConnection(std::string ip, int port) {
 
     sockaddr_in server;
     server.sin_family = AF_INET;
-    server.sin_port = htons(port);
-    inet_pton(AF_INET, ip.c_str(), &server.sin_addr.s_addr);
+    server.sin_port = htons(this->port);
+    inet_pton(AF_INET, this->ip.c_str(), &server.sin_addr.s_addr);
 
     if (bind(listener, (sockaddr *) &server, sizeof(server)) == SOCKET_ERROR) {
         std::cout << "Bind failed with error code: " << WSAGetLastError() << std::endl;
@@ -44,7 +54,9 @@ CuberConnection::CuberConnection(std::string ip, int port) {
         return;
     }
 
-    std::cout << "Listening for connections on " << ip << ":" << port << std::endl;
+    std::cout << "Listening for connections on " << this->ip << ":" << this->port << std::endl;
+
+    listening = true;
 }
 
 void CuberConnection::tick() {
@@ -75,6 +87,7 @@ void CuberConnection::tick() {
 }
 
 void CuberConnection::acceptClient() {
+    if (!listening) return;
     //Use select to check if there is a client waiting to connect
     fd_set readfds;
     FD_ZERO(&readfds);

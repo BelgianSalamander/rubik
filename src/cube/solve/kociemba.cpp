@@ -1170,7 +1170,7 @@ std::optional<std::vector<int>> solvePhaseTwo(SuperFastPhaseTwoCube& cube, bool&
     return std::nullopt;
 }
 
-std::optional<std::vector<Move>> kociembaSolve(FastRubiksCube cube, bool& halt) {
+std::optional<std::vector<Move>> kociembaSolve(FastRubiksCube cube, bool& halt, std::function<void (std::string)> statusUpdateCallback) {
     FLIP_UD_SLICE_SYM_COORDS.ensureLoaded();
     CORNER_TWIST_MOVE_TABLE.ensureLoaded();
     FLIP_UD_SLICE_SYM_MOVE_TABLE.ensureLoaded();
@@ -1215,6 +1215,7 @@ std::optional<std::vector<Move>> kociembaSolve(FastRubiksCube cube, bool& halt) 
                 bestMoves.insert(bestMoves.end(), phaseTwoMoves->begin(), phaseTwoMoves->end());
                 bestTotalLength = numPhaseOneMoves + phaseTwoMoves->size();
                 //std::cout << "Best total length is now " << bestTotalLength << std::endl;
+                statusUpdateCallback("Found " + std::to_string(bestTotalLength) + " move solution");
             }
         });
     }
@@ -1317,7 +1318,7 @@ void collectData() {
         bool halt = false;
         auto start = std::chrono::high_resolution_clock::now();
         std::thread t([&]() {
-            auto sol = kociembaSolve(cubes[i], halt);
+            auto sol = kociembaSolve(cubes[i], halt, [](std::string message){});
             if (sol) {
                 numMoves.push_back(sol->size());
             } else {

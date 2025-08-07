@@ -88,8 +88,11 @@ private:
     std::optional<CubeScanner> scanner;
     CuberConnection robot;
 
+    char robotIpField[20];
+
     std::optional<std::thread> solverThread;
     std::optional<std::vector<Move>> solverResult;
+    std::string solverStatusMessage;
     std::mutex solverMutex;
     SolverState solverState = SolverState::OFF;
     bool haltSolver = false;

@@ -18,12 +18,26 @@ public:
     CuberConnection(std::string ip, int port);
     ~CuberConnection();
 
+    void reconfigure(std::string ip, int port);
+
     void tick();
 
     bool isActive();
 
     void resetRobot();
     void doMoves(std::string moves);
+
+    const std::string& getIp() const {
+        return ip;
+    }
+
+    int getPort() const {
+        return port;
+    }
+
+    bool isListening() const {
+        return listening;
+    }
 
     std::queue<Move> movesExecuted;
 private:
@@ -44,8 +58,12 @@ private:
         }
     };
 
+    std::string ip;
+    int port;
+
     SOCKET listener;
 
+    bool listening = false;
     bool active = false;
     SOCKET client;
 
