@@ -5,6 +5,7 @@
 #include <fstream>
 #include <iostream>
 #include <chrono>
+#include <filesystem>
 #include "cube/FastRubiksCube.h"
 
 template<typename T>
@@ -55,7 +56,13 @@ public:
             auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
             std::cout << "Took " << elapsed << " milliseconds!" << std::endl;
 
+            std::filesystem::path filePath = path;
+            std::filesystem::create_directories(filePath.parent_path());
             std::ofstream out(path, std::ios::binary);
+            if (!out) {
+                std::cerr << "Couldn't open " << path << "\n";
+                exit(1);
+            }
             Serializer::serialize(this->ptr, size, out);
             out.close();
 

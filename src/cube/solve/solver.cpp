@@ -55,6 +55,9 @@ void genDataDisk(KeyGetter keyGetter, const std::function<void(uint64_t, uint8_t
     int depth = 0;
     std::string frontierPath = "data/tmp/frontier-0.bin";
 
+    std::filesystem::path frontierPathObject = frontierPath;
+    std::filesystem::create_directories(frontierPathObject.parent_path());
+
     std::ofstream frontierOut(frontierPath, std::ios::binary);
     FastRubiksCube startCube;
     CachedCube start(startCube, keyGetter(startCube));
